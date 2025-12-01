@@ -1,5 +1,5 @@
 import { IAccountAllPositionsDetailed } from "./account";
-import { IPythPrice } from "./oracle";
+import { IPythInfo } from "./oracle";
 import { IConfig } from "./burrow";
 import { IAssetDetailed } from "./asset";
 
@@ -7,7 +7,7 @@ export interface ILendingData {
   account_all_positions?: IAccountAllPositionsDetailed;
   assets_paged_detailed: IAssetDetailed[];
   config: IConfig;
-  token_pyth_infos: Record<string, IPythPrice>;
+  token_pyth_infos: Record<string, IPythInfo>;
 }
 export type IStatus = "success" | "error";
 

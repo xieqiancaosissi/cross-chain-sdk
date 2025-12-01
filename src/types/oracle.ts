@@ -22,7 +22,7 @@ export interface IPythInfo {
   default_price: {
     multiplier: string;
     decimals: number;
-  };
+  } | null;
 }
 
 export interface IPythPrice {
