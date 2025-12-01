@@ -75,10 +75,6 @@ export interface IAssetDetailed {
   price: IPrice;
   metadata?: IMetadata;
 }
-export interface Assets {
-  [id: string]: IAssetDetailed;
-}
-
 export type Asset = Omit<IAssetDetailed, "farms"> & {
   farms: {
     supplied: {
@@ -92,7 +88,9 @@ export type Asset = Omit<IAssetDetailed, "farms"> & {
     };
   };
 };
-
+export interface Assets {
+  [id: string]: IAssetDetailed;
+}
 export interface IAssetsView {
   [id: string]: Asset;
 }
