@@ -13,9 +13,11 @@ interface INEARConfig {
   txIdApiUrl: string;
   AM_CONTRACT: string;
   NBTCTokenId: string;
+  WBTC_TOKEN_ID: string;
   hiddenAssets: string[];
   oneClickUrl: string;
   RELAYER_ID: string;
+  
 }
 let customNodeUrl = "";
 export const setCustomNodeUrl = (nodeUrl: string) => {
@@ -34,6 +36,8 @@ function getConfig() {
     WRAP_NEAR_CONTRACT_ID: "wrap.near",
     XRHEA_TOKEN_ID: "xtoken.rhealab.near",
     NBTCTokenId: "nbtc.bridge.near",
+    WBTC_TOKEN_ID:
+    "2260fac5e5542a773aa44fbcfedf7c193bc2c599.factory.bridge.near",
     indexUrl: "https://api.rhea.finance",
     dataServiceUrl: "https://apidata.rhea.finance",
     txIdApiUrl: "https://api3.nearblocks.io",
