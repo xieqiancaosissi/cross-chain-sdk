@@ -1,5 +1,5 @@
 import Decimal from "decimal.js";
-import { Portfolio, Assets } from "../types";
+import { Portfolio, Assets, IAssetsView } from "../types";
 import { DEFAULT_POSITION } from "../config/constantConfig";
 import { expandTokenDecimal } from "../utils/numbers";
 import { MAX_RATIO } from "../config/constantConfig";
@@ -11,7 +11,7 @@ export const getAdjustedSum = ({
 }: {
   type: "borrowed" | "collateral";
   portfolio: Portfolio;
-  assets: Assets;
+  assets: IAssetsView | Assets;
 }) => {
   const positionId = DEFAULT_POSITION;
   const result = Object.keys(portfolio.positions[positionId]?.[type] || {}).map(

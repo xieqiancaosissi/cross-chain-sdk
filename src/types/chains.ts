@@ -1,3 +1,4 @@
+import { Portfolio } from "./account";
 interface ITransferAction {
   receiver_id: string;
   amount: string;
@@ -103,4 +104,19 @@ export interface IIntentSwapDetails {
   destinationChainTxHashes: {
     hash: string;
   }[];
+}
+
+export interface IGasData {
+  portfolioMinusGas: Portfolio;
+  tokenId: string;
+  amount: string | number;
+  amountToken: string | number;
+  amountBurrow: string | number;
+  relayerFeeUsd: string | number;
+  simpleWithdrawData: {
+    tokenId: string;
+    amount: string;
+    amountToken: string;
+    amountBurrow: string;
+  };
 }

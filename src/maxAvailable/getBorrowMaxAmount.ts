@@ -1,6 +1,6 @@
 import _ from "lodash";
 import Decimal from "decimal.js";
-import { Assets } from "../types";
+import { Assets, IAssetsView } from "../types";
 import { getAdjustedSum } from "../healthFactor/common";
 import { DEFAULT_POSITION, MAX_RATIO } from "../config/constantConfig";
 import { Portfolio } from "../types";
@@ -11,7 +11,7 @@ const computeBorrowMaxAmount = ({
   portfolio,
 }: {
   tokenId: string;
-  assets: Assets;
+  assets: Assets | IAssetsView;
   portfolio: Portfolio;
 }) => {
   const asset = assets[tokenId];
@@ -56,9 +56,9 @@ export const getBorrowMaxAmount = ({
 }: {
   tokenId: string;
   portfolio: Portfolio;
-  assets: Assets;
+  assets: Assets | IAssetsView;
 }) => {
-  if (!_.isEmpty(assets) || !portfolio || !tokenId)
+  if (_.isEmpty(assets) || !portfolio || !tokenId)
     return {
       [DEFAULT_POSITION]: { maxBorrowAmount: 0, maxBorrowValue: 0 },
     };

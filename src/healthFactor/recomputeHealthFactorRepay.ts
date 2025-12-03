@@ -1,9 +1,9 @@
 import Decimal from "decimal.js";
 import _ from "lodash";
 import { expandTokenDecimal } from "../utils/numbers";
-import { MAX_RATIO } from "../config/constantConfig";
+import { MAX_RATIO, DEFAULT_POSITION } from "../config/constantConfig";
 import { getAdjustedSum } from "./common";
-import { Portfolio, Assets } from "../types";
+import { Portfolio, Assets, IAssetsView } from "../types";
 
 export const recomputeHealthFactorRepay = ({
   tokenId,
@@ -14,17 +14,22 @@ export const recomputeHealthFactorRepay = ({
 }: {
   tokenId: string;
   amount: number;
-  position: string;
+  position?: string;
   portfolio: Portfolio;
-  assets: Assets;
+  assets: IAssetsView | Assets;
 }) => {
-  if (_.isEmpty(assets)) return { healthFactor: 0, maxBorrowValue: 0 };
-  if (!portfolio || !tokenId) return { healthFactor: 0, maxBorrowValue: 0 };
+  if (
+    _.isEmpty(assets) ||
+    !portfolio ||
+    !tokenId ||
+    !portfolio?.positions?.[position || DEFAULT_POSITION]?.borrowed?.[tokenId]
+  )
+    return { healthFactor: 0, maxBorrowValue: new Decimal(0) };
   const asset = assets[tokenId];
   const { metadata, config } = asset;
-  const decimals = metadata?.decimals || 0 + config.extra_decimals;
+  const decimals = (metadata?.decimals || 0) + config.extra_decimals;
   const borrowedBalance = new Decimal(
-    portfolio.positions[position].borrowed[tokenId].balance
+    portfolio.positions[position || DEFAULT_POSITION].borrowed[tokenId].balance
   );
   const newBalance = Decimal.max(
     0,
@@ -32,8 +37,9 @@ export const recomputeHealthFactorRepay = ({
   );
 
   const clonedPortfolio = JSON.parse(JSON.stringify(portfolio));
-  clonedPortfolio.positions[position].borrowed[tokenId].balance =
-    newBalance.toFixed();
+  clonedPortfolio.positions[position || DEFAULT_POSITION].borrowed[
+    tokenId
+  ].balance = newBalance.toFixed();
 
   const adjustedCollateralSum = getAdjustedSum({
     type: "collateral",

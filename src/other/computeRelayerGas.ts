@@ -1,6 +1,6 @@
 import _ from "lodash";
 import Decimal from "decimal.js";
-import { Assets, Portfolio } from "../types";
+import { Assets, IAssetsView, Portfolio, IGasData } from "../types";
 import { DEFAULT_POSITION } from "../config/constantConfig";
 import {
   decimalMax,
@@ -20,9 +20,9 @@ export const computeRelayerGas = ({
   nearStorageAmount: string | number;
   mca: string;
   relayerGasFees: Record<string, string>;
-  assets: Assets;
+  assets: IAssetsView | Assets;
   portfolio: Portfolio;
-}) => {
+}): IGasData | undefined => {
   if (!mca || _.isEmpty(assets) || _.isEmpty(portfolio)) return;
   const { tokenId, amount, relayerFeeUsd } = searchMatchAssetId({
     portfolio,
@@ -34,7 +34,7 @@ export const computeRelayerGas = ({
   const asset = assets[tokenId];
   const { metadata, config } = asset;
   const position = DEFAULT_POSITION;
-  const decimals = metadata?.decimals || 0 + config.extra_decimals;
+  const decimals = (metadata?.decimals || 0) + config.extra_decimals;
   const clonedPortfolio: Portfolio = JSON.parse(JSON.stringify(portfolio));
 
   if (!clonedPortfolio.positions[position]) {
@@ -120,19 +120,27 @@ export const computeRelayerGas = ({
   const healthFactor =
     healthFactorTemp < MAX_RATIO ? healthFactorTemp : MAX_RATIO;
   if (healthFactor > 105) {
+    const amountToken = expandTokenDecimal(
+      amount,
+      asset?.metadata?.decimals || 0
+    ).toFixed(0, Decimal.ROUND_DOWN);
+    const amountBurrow = expandTokenDecimal(
+      amount,
+      (asset?.config?.extra_decimals || 0) + (asset?.metadata?.decimals || 0)
+    ).toFixed(0, Decimal.ROUND_DOWN);
     return {
       portfolioMinusGas: clonedPortfolio,
       tokenId,
       amount,
-      relayerFeeUsd,
-      amountToken: expandTokenDecimal(
+      relayerFeeUsd: relayerFeeUsd || 0,
+      amountToken,
+      amountBurrow,
+      simpleWithdrawData: {
+        tokenId,
         amount,
-        asset?.metadata?.decimals || 0
-      ).toFixed(0, Decimal.ROUND_DOWN),
-      amountBurrow: expandTokenDecimal(
-        amount,
-        (asset?.config?.extra_decimals || 0) + (asset?.metadata?.decimals || 0)
-      ).toFixed(0, Decimal.ROUND_DOWN),
+        amountToken,
+        amountBurrow,
+      },
     };
   }
   return;
@@ -145,7 +153,7 @@ function searchMatchAssetId({
   relayerGasFees,
 }: {
   portfolio: Portfolio;
-  assets: Assets;
+  assets: IAssetsView | Assets;
   nearStorageAmount: string | number;
   relayerGasFees: Record<string, string>;
 }) {

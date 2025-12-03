@@ -17,7 +17,7 @@ interface INEARConfig {
   hiddenAssets: string[];
   oneClickUrl: string;
   RELAYER_ID: string;
-  
+  HHHH: string;
 }
 let customNodeUrl = "";
 export const setCustomNodeUrl = (nodeUrl: string) => {
@@ -26,7 +26,7 @@ export const setCustomNodeUrl = (nodeUrl: string) => {
 function getConfig() {
   let NEAR_CONFIG: INEARConfig = {
     networkId: "mainnet",
-    nodeUrl: customNodeUrl || "https://nearinner.deltarpc.com",
+    nodeUrl: customNodeUrl || "https://free.rpc.fastnear.com",
     explorerUrl: "https://nearblocks.io",
     LOGIC_CONTRACT_NAME: "contract.main.burrow.near",
     AM_CONTRACT: "multica.near",
@@ -37,7 +37,7 @@ function getConfig() {
     XRHEA_TOKEN_ID: "xtoken.rhealab.near",
     NBTCTokenId: "nbtc.bridge.near",
     WBTC_TOKEN_ID:
-    "2260fac5e5542a773aa44fbcfedf7c193bc2c599.factory.bridge.near",
+      "2260fac5e5542a773aa44fbcfedf7c193bc2c599.factory.bridge.near",
     indexUrl: "https://api.rhea.finance",
     dataServiceUrl: "https://apidata.rhea.finance",
     txIdApiUrl: "https://api3.nearblocks.io",
@@ -51,8 +51,9 @@ function getConfig() {
       "aurora",
       "token.burrow.near",
       "45.contract.portalbridge.near",
-      "shadow_ref_v1-4179"
+      "shadow_ref_v1-4179",
     ],
+    HHHH: "xieqian",
   };
   return {
     NEAR: NEAR_CONFIG,

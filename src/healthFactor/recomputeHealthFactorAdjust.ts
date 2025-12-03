@@ -1,8 +1,9 @@
+import Decimal from "decimal.js";
 import _ from "lodash";
 import { expandTokenDecimal } from "../utils/numbers";
 import { MAX_RATIO, DEFAULT_POSITION } from "../config/constantConfig";
 import { getAdjustedSum } from "./common";
-import { Portfolio, Assets } from "../types";
+import { Portfolio, Assets, IAssetsView } from "../types";
 
 export const recomputeHealthFactorAdjust = ({
   tokenId,
@@ -13,15 +14,17 @@ export const recomputeHealthFactorAdjust = ({
   tokenId: string;
   amount: number;
   portfolio: Portfolio;
-  assets: Assets;
+  assets: IAssetsView | Assets;
 }) => {
-  if (_.isEmpty(assets)) return { healthFactor: 0, maxBorrowValue: 0 };
-  if (!portfolio || !tokenId) return { healthFactor: 0, maxBorrowValue: 0 };
+  if (_.isEmpty(assets))
+    return { healthFactor: 0, maxBorrowValue: new Decimal(0) };
+  if (!portfolio || !tokenId)
+    return { healthFactor: 0, maxBorrowValue: new Decimal(0) };
   const asset = assets[tokenId];
   const { metadata, config } = asset;
   const position = DEFAULT_POSITION;
 
-  const decimals = metadata?.decimals || 0 + config.extra_decimals;
+  const decimals = (metadata?.decimals || 0) + config.extra_decimals;
 
   const newBalance = expandTokenDecimal(amount, decimals).toFixed();
 

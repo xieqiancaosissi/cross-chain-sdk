@@ -3,7 +3,7 @@ import _ from "lodash";
 import { shrinkToken, expandTokenDecimal } from "../utils/numbers";
 import { DEFAULT_POSITION } from "../config/constantConfig";
 import { decimalMax, decimalMin } from "../utils/numbers";
-import { Assets, Portfolio } from "../types";
+import { Assets, IAssetsView, Portfolio } from "../types";
 import { getAdjustedSum } from "../healthFactor/common";
 export const computeWithdrawMaxAmount = ({
   tokenId,
@@ -11,11 +11,11 @@ export const computeWithdrawMaxAmount = ({
   portfolio,
 }: {
   tokenId: string;
-  assets: Assets;
+  assets: Assets | IAssetsView;
   portfolio: Portfolio;
 }) => {
   const asset = assets[tokenId];
-  const position = asset.isLpToken ? tokenId : DEFAULT_POSITION;
+  const position = DEFAULT_POSITION;
   const assetPrice = asset.price
     ? new Decimal(asset.price.usd || "0")
     : new Decimal(0);
@@ -69,7 +69,7 @@ export const computeWithdrawMaxAmount = ({
         .mul(
           expandTokenDecimal(
             1,
-            asset.config.extra_decimals + asset.metadata.decimals
+            asset.config.extra_decimals + (asset?.metadata?.decimals || 0)
           )
         )
         .trunc();
@@ -93,12 +93,12 @@ export const getWithdrawMaxAmount = ({
   portfolio,
 }: {
   tokenId: string;
-  assets: Assets;
+  assets: Assets | IAssetsView;
   portfolio: Portfolio;
 }) => {
   const asset = assets[tokenId];
   const { metadata, config } = asset;
-  const decimals = metadata?.decimals || 0 + config.extra_decimals;
+  const decimals = (metadata?.decimals || 0) + config.extra_decimals;
   const { maxAmount } = computeWithdrawMaxAmount({
     tokenId,
     assets,

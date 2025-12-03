@@ -60,7 +60,6 @@ import {
   getBalance,
   getAllFarms,
   getPrices,
-  getPortfolio,
 } from "@rhea-finance/cross-chain-sdk";
 
 // Batch query - get all data at once
@@ -102,11 +101,6 @@ const prices: IPrices | undefined = await getPrices({
   config: config,
 });
 
-// Get portfolio - format account data for easier use
-const portfolio: Portfolio = getPortfolio(accountAllPositions);
-console.log(portfolio.supplied);
-console.log(portfolio.collateral);
-console.log(portfolio.borrowed);
 ```
 
 ### Multi-chain Account (MCA) Management
@@ -278,8 +272,8 @@ const depositAddress = quoteResult.quoteSuccessResult?.quote?.depositAddress;
 //   mca: Multi-chain account ID
 //   relayerGasFees: Relayer gas fees for different chains
 //   assets: Assets data (from getAssets() or batchViews())
-//   portfolio: Portfolio data (from getPortfolio() or batchViews())
-const simpleWithdrawData: ISimpleWithdraw | null = await getSimpleWithdrawData({
+//   portfolio: Portfolio data (from getAccountAllPositions() or batchViews())
+const simpleWithdrawData: ISimpleWithdraw | null = computeRelayerGas({
   nearStorageAmount,
   mca,
   relayerGasFees,
@@ -716,7 +710,6 @@ if (relayer_result?.code == 0) {
 ### Views
 
 - `batchViews` - Batch query views (account, assets, config, etc.)
-- `getPortfolio` - Get portfolio
 - `getAssets` - Get asset list
 - `getPrices` - Get price information
 - `getBalance` - Get balance
@@ -777,6 +770,14 @@ if (relayer_result?.code == 0) {
 - `config_evm` - EVM chain configuration
 - `config_solana` - Solana chain configuration
 - `config_btc` - Bitcoin chain configuration
+- `setCustomNodeUrl` - Set custom RPC node URL for NEAR chain. This function allows you to customize the RPC endpoint used for NEAR chain interactions.
+
+```typescript
+import { setCustomNodeUrl } from "@rhea-finance/cross-chain-sdk";
+
+// Set custom NEAR RPC node URL
+setCustomNodeUrl("https://your-custom-near-rpc-url.com");
+```
 
 ### Type Definitions
 
@@ -796,19 +797,15 @@ Check out the [cross-chain-demo](./../cross-chain-demo) project for more complet
 ### Example 1: Query Account Data
 
 ```typescript
-import { batchViews, getPortfolio } from "@rhea-finance/cross-chain-sdk";
+import { batchViews  } from "@rhea-finance/cross-chain-sdk";
 
 async function fetchAccountData(mcaId: string) {
   // Batch query
   const lendingData = await batchViews(mcaId);
   
-  // Convert to portfolio format
-  const portfolio = getPortfolio(lendingData.account_all_positions);
-  
   return {
     assets: lendingData.assets_paged_detailed,
     config: lendingData.config,
-    portfolio,
   };
 }
 ```

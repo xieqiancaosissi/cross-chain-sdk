@@ -9,16 +9,15 @@ export const initialStaking = {
   x_booster_amount: "0",
 };
 
-export const transformPortfolio = (account: {
-  portfolio: IAccountAllPositionsDetailed;
-}): Portfolio | undefined => {
-  const { portfolio } = account;
+export const transformPortfolio = (
+  portfolio: IAccountAllPositionsDetailed
+): Portfolio | undefined => {
   if (!portfolio) return undefined;
   const { booster_staking, booster_stakings, supplied, positions, farms } =
     portfolio;
 
   const hasNonFarmedAssets =
-    account.portfolio.has_non_farmed_assets || hasZeroSharesFarmRewards(farms);
+    portfolio.has_non_farmed_assets || hasZeroSharesFarmRewards(farms);
   Object.keys(positions).forEach((shadow_id: string) => {
     const { borrowed, collateral } = positions[shadow_id];
     positions[shadow_id].borrowed = listFarmToMap(borrowed);

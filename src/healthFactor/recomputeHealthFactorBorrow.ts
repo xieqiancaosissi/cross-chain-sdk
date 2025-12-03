@@ -1,10 +1,10 @@
 import Decimal from "decimal.js";
 import _ from "lodash";
 import { expandTokenDecimal } from "../utils/numbers";
-import { MAX_RATIO } from "../config/constantConfig";
+import { MAX_RATIO, DEFAULT_POSITION } from "../config/constantConfig";
 import { getAdjustedSum } from "./common";
-import { Portfolio, Assets } from "../types";
-export const recomputeHealthFactor = ({
+import { Portfolio, Assets, IAssetsView } from "../types";
+export const recomputeHealthFactorBorrow = ({
   tokenId,
   amount,
   position,
@@ -13,18 +13,20 @@ export const recomputeHealthFactor = ({
 }: {
   tokenId: string;
   amount: number;
-  position: string;
+  position?: string;
   portfolio: Portfolio;
-  assets: Assets;
+  assets: IAssetsView | Assets;
 }) => {
-  if (_.isEmpty(assets)) return { healthFactor: 0, maxBorrowValue: 0 };
-  if (!portfolio || !tokenId) return { healthFactor: 0, maxBorrowValue: 0 };
+  if (_.isEmpty(assets))
+    return { healthFactor: 0, maxBorrowValue: new Decimal(0) };
+  if (!portfolio || !tokenId)
+    return { healthFactor: 0, maxBorrowValue: new Decimal(0) };
   const asset = assets[tokenId];
   const { metadata, config } = asset;
-  const decimals = metadata?.decimals || 0 + config.extra_decimals;
+  const decimals = (metadata?.decimals || 0) + config.extra_decimals;
   const clonedPortfolio: Portfolio = JSON.parse(JSON.stringify(portfolio));
-  if (!clonedPortfolio.positions[position]) {
-    clonedPortfolio.positions[position] = {
+  if (!clonedPortfolio.positions[position || DEFAULT_POSITION]) {
+    clonedPortfolio.positions[position || DEFAULT_POSITION] = {
       borrowed: {
         [tokenId]: {
           balance: "0",
@@ -34,21 +36,28 @@ export const recomputeHealthFactor = ({
       },
       collateral: {},
     };
-  } else if (!clonedPortfolio.positions[position].borrowed[tokenId]) {
-    clonedPortfolio.positions[position].borrowed[tokenId] = {
-      balance: "0",
-      shares: "0",
-      apr: "0",
-    };
+  } else if (
+    !clonedPortfolio.positions[position || DEFAULT_POSITION].borrowed[tokenId]
+  ) {
+    clonedPortfolio.positions[position || DEFAULT_POSITION].borrowed[tokenId] =
+      {
+        balance: "0",
+        shares: "0",
+        apr: "0",
+      };
   }
   const newBalance = expandTokenDecimal(amount, decimals)
     .plus(
       new Decimal(
-        clonedPortfolio.positions[position].borrowed[tokenId]?.balance || 0
+        clonedPortfolio.positions[position || DEFAULT_POSITION].borrowed[
+          tokenId
+        ]?.balance || 0
       )
     )
     .toFixed();
-  clonedPortfolio.positions[position].borrowed[tokenId].balance = newBalance;
+  clonedPortfolio.positions[position || DEFAULT_POSITION].borrowed[
+    tokenId
+  ].balance = newBalance;
 
   const adjustedCollateralSum = getAdjustedSum({
     type: "collateral",

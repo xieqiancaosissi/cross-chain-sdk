@@ -3,7 +3,7 @@ import _ from "lodash";
 import { expandTokenDecimal } from "../utils/numbers";
 import { MAX_RATIO, DEFAULT_POSITION } from "../config/constantConfig";
 import { getAdjustedSum } from "./common";
-import { Portfolio, Assets } from "../types";
+import { Portfolio, Assets, IAssetsView } from "../types";
 
 export const recomputeHealthFactorSupply = ({
   tokenId,
@@ -15,14 +15,14 @@ export const recomputeHealthFactorSupply = ({
   tokenId: string;
   amount: number;
   portfolio: Portfolio;
-  assets: Assets;
+  assets: IAssetsView | Assets;
   useAsCollateral: boolean;
 }) => {
   if (_.isEmpty(assets) || !tokenId || !portfolio)
-    return { healthFactor: 0, maxBorrowValue: 0 };
+    return { healthFactor: 0, maxBorrowValue: new Decimal(0) };
   const asset = assets[tokenId];
   const { metadata, config } = asset;
-  const decimals = metadata?.decimals || 0 + config.extra_decimals;
+  const decimals = (metadata?.decimals || 0) + config.extra_decimals;
   const position = DEFAULT_POSITION;
   const clonedPortfolio: Portfolio = JSON.parse(JSON.stringify(portfolio));
   const amountDecimal = expandTokenDecimal(amount, decimals);
