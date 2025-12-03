@@ -5,10 +5,12 @@ import {
   PortfolioAsset,
   IPositionsOrigin,
   IPositions,
+  ViewMethodsLogic,
 } from "../types";
 import { DEFAULT_POSITION } from "../config/constantConfig";
 import { hasZeroSharesFarmRewards } from "../utils";
-
+import { view_on_near } from "../chains";
+import { config_near } from "../config";
 const convertAssetArrayToObject = (
   assets: IPortfolioAssetOrigin[]
 ): { [tokenId: string]: PortfolioAsset } => {
@@ -63,4 +65,17 @@ export const getPortfolio = (
       accountPositions.has_non_farmed_assets ||
       hasZeroSharesFarmRewards(accountPositions.farms),
   };
+};
+
+export const getAccountAllPositions = async (
+  account_id: string
+): Promise<IAccountAllPositionsDetailed> => {
+  const accountDetailed = (await view_on_near({
+    contractId: config_near.LOGIC_CONTRACT_NAME,
+    methodName: ViewMethodsLogic[ViewMethodsLogic.get_account_all_positions],
+    args: {
+      account_id,
+    },
+  })) as IAccountAllPositionsDetailed;
+  return accountDetailed;
 };

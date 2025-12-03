@@ -9,6 +9,7 @@ import {
   IPrice,
   ViewMethodsOracle,
   ViewMethodsToken,
+  ViewMethodsLogic,
 } from "../types";
 import { config_near } from "../config";
 import { view_on_near } from "../chains";
@@ -233,4 +234,11 @@ const getOraclePrices = async () => {
   }
 };
 
-export { getPrices };
+const getTokenPythInfos = async () => {
+  return (await view_on_near({
+    contractId: config_near.LOGIC_CONTRACT_NAME,
+    methodName: ViewMethodsLogic[ViewMethodsLogic.get_all_token_pyth_infos],
+  })) as Record<string, IPythInfo>;
+};
+
+export { getPrices, getTokenPythInfos };
