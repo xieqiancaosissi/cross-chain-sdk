@@ -1,3 +1,9 @@
+# ⚠️ Deprecated
+
+This repository has been deprecated and migrated to [https://github.com/rhea-finance/cross-chain-sdk].
+
+Please use the new repository for the latest updates and contributions.
+
 # @rhea-finance/cross-chain-sdk
 
 Cross-chain lending SDK that supports unified lending operations across multiple blockchains, including EVM chains, Solana, Bitcoin, and NEAR.
